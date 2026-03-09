@@ -1,15 +1,26 @@
-Final Project DS4420
+DS4420 Final Project
+Project Idea
 
-Dataset Link: https://github.com/dcaribou/transfermarkt-datasets
+Predict soccer player market value and transfer fees using player data.
 
-Project Idea: predict market value and transfer fees for players
+Datasets
+Transfermarkt Dataset
 
+Dataset source:
+https://github.com/dcaribou/transfermarkt-datasets
 
-Dataset up:
+Player Scores Dataset
 
-Download data from kaggle
+Download from Kaggle:
 https://www.kaggle.com/datasets/davidcariboo/player-scores
 
-and make sure folder is called archive
+After downloading the Kaggle dataset, extract it and make sure the folder is named:
 
-too big to push to github
+archive
+
+
+Notes
+
+The Kaggle dataset is too large to push to GitHub, so it must be downloaded manually.
+
+Ensure the folder name is exactly archive after extracting the dataset.
