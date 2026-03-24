@@ -1,6 +1,8 @@
 DS4420 Final Project
 Project Idea
 
+Dataset Cariboo: https://github.com/dcaribou/transfermarkt-datasets
+Dataset D2Ski: https://github.com/d2ski/football-transfers-data 
 Predict soccer player market value and transfer fees using player data.
 
 Datasets
