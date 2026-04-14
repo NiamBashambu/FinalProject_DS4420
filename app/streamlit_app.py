@@ -326,7 +326,7 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
     st.markdown("## Transfer Market Inefficiencies")
     st.markdown(
         f"<p style='color:{TEXT_MUTED}; font-size:0.875rem; margin-top:-0.6rem; margin-bottom:1.5rem;'>"
-        "DS4420 &nbsp;·&nbsp; Spring 2026 &nbsp;·&nbsp; Modeling fee premiums in European football transfers"
+        "Modeling fee premiums in European football transfers"
         "</p>",
         unsafe_allow_html=True,
     )
@@ -408,7 +408,7 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
     m1.metric(
         "Global Median Premium",
         f"{global_premium:.2f}×",
-        help="exp(α) — how much more than MLP predicted value clubs typically pay, on average",
+        help="exp: how much more than MLP predicted value clubs typically pay, on average",
     )
     m2.metric(
         "Highest-Premium Corridor",
@@ -444,11 +444,9 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
     position_img = ASSETS / "catepillar_position.png"
 
     with pc1:
-        st.markdown(f"**Corridor Effects (γ)** : log-scale across {len(gamma_cols)} corridors")
         st.image(str(corridor_img), use_container_width=True)
 
     with pc2:
-        st.markdown("**Position Effects** : relative to global mean")
         st.image(str(position_img), use_container_width=True)
 
     # Age band summary
@@ -461,10 +459,7 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
         unsafe_allow_html=True,
     )
     age_band_img = ASSETS / "age_band.png"
-    if age_band_img.exists():
-        st.image(str(age_band_img), use_container_width=True)
-    else:
-        _age_band_chart(post)
+    st.image(str(age_band_img), use_container_width=True)
 
 # PAGE 2 — DEAL EVALUATOR
 def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
@@ -552,7 +547,6 @@ def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
             f"<strong>{buy_c.replace('_', ' ')}</strong> with a market value of "
             f"<strong>{fmt_m(mv_m)}</strong> has typically sold for "
             f"<strong>{fmt_m(lo5)}</strong> to <strong>{fmt_m(hi95)}</strong> "
-            f"<span style='color:{TEXT_MUTED};'>(90% credible interval).</span>"
         )
         st.markdown(
             f"<div class='verdict-box verdict-range'>{summary}</div>",
@@ -857,7 +851,7 @@ def main() -> None:
         st.markdown(
             "<div style='margin-bottom:1.75rem;'>"
             "<div style='font-size:1.15rem; font-weight:700; color:#f1f5f9;"
-            " letter-spacing:-0.02em;'>Transfer Intel</div>"
+            " letter-spacing:-0.02em;'>Job Vengalil | Niam Bashambu</div>"
             f"<div style='font-size:0.65rem; color:#475569; text-transform:uppercase;"
             f" letter-spacing:0.1em;'>DS4420 · Spring 2026</div>"
             "</div>",
