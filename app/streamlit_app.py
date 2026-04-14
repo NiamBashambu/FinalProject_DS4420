@@ -1,10 +1,10 @@
 """
-Transfer Market Intelligence — DS4420 Final Project
+Transfer Intel - DS4420 Final Project
 Streamlit app entry point.
 
 Two pages:
-  1. Project Overview  — pipeline description, key findings, caterpillar plots
-  2. Deal Evaluator    — posterior-based transfer fee assessment tool
+  1. Project Overview  - pipeline description, key findings, caterpillar plots
+  2. Deal Evaluator    - posterior-based transfer fee assessment tool
 """
 
 from __future__ import annotations
@@ -15,9 +15,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from pathlib import Path
 
-# ─────────────────────────────────────────────────────────────────────────────
-# PAGE CONFIG  (must be the very first Streamlit call)
-# ─────────────────────────────────────────────────────────────────────────────
+# PAGE CONFIG 
 st.set_page_config(
     page_title="Transfer Intel | DS4420",
     page_icon="⚽",
@@ -25,15 +23,11 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
 # PATHS
-# ─────────────────────────────────────────────────────────────────────────────
 BASE   = Path(__file__).parent.parent          # repo root
 ASSETS = Path(__file__).parent / "assets"      # app/assets/
 
-# ─────────────────────────────────────────────────────────────────────────────
 # CONSTANTS
-# ─────────────────────────────────────────────────────────────────────────────
 POS_LABELS: dict[str, str] = {
     "AM": "Attacking Mid",
     "CB": "Centre Back",
@@ -59,17 +53,15 @@ DANGER       = "#ef4444"
 WARNING      = "#f59e0b"
 NEUTRAL      = "#94a3b8"
 
-# ─────────────────────────────────────────────────────────────────────────────
 # CUSTOM CSS
-# ─────────────────────────────────────────────────────────────────────────────
 CSS = f"""
 <style>
-/* ── Remove Streamlit chrome ───────────────────────────────────────────── */
+# Remove Streamlit chrome 
 #MainMenu {{visibility: hidden;}}
 footer    {{visibility: hidden;}}
 header    {{visibility: hidden;}}
 
-/* ── Root ──────────────────────────────────────────────────────────────── */
+# Root
 html, body, [class*="css"] {{
     font-family: 'Inter', 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
 }}
@@ -77,7 +69,7 @@ html, body, [class*="css"] {{
     background-color: #0a0e1a;
 }}
 
-/* ── Main container ────────────────────────────────────────────────────── */
+# Main container  
 .block-container {{
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -86,7 +78,7 @@ html, body, [class*="css"] {{
     max-width: 1600px;
 }}
 
-/* ── Sidebar ───────────────────────────────────────────────────────────── */
+# Sidebar 
 [data-testid="stSidebar"] {{
     background-color: #0d1117;
     border-right: 1px solid #1e293b;
@@ -112,7 +104,7 @@ html, body, [class*="css"] {{
     color: #f1f5f9 !important;
 }}
 
-/* ── Headings ──────────────────────────────────────────────────────────── */
+# Headings 
 h1, h2, h3 {{
     color: #f1f5f9 !important;
     font-weight: 600;
@@ -127,7 +119,7 @@ h2 {{
 }}
 h3 {{ font-size: 0.95rem !important; color: {TEXT_MUTED} !important; font-weight: 500; }}
 
-/* ── Metrics ───────────────────────────────────────────────────────────── */
+# Metrics
 [data-testid="stMetric"] {{
     background: {CARD_BG};
     border: 1px solid #1e293b;
@@ -146,10 +138,10 @@ h3 {{ font-size: 0.95rem !important; color: {TEXT_MUTED} !important; font-weight
     font-weight: 600;
 }}
 
-/* ── Divider ───────────────────────────────────────────────────────────── */
+# Divider 
 hr {{ border-color: #1e293b; margin: 1.2rem 0; }}
 
-/* ── Verdict / info boxes ──────────────────────────────────────────────── */
+# Verdict / info boxes 
 .verdict-box {{
     border-radius: 8px;
     padding: 0.85rem 1.1rem;
@@ -162,7 +154,7 @@ hr {{ border-color: #1e293b; margin: 1.2rem 0; }}
 .verdict-overpay {{ background: #2a0a0a; border-left: 3px solid {DANGER};        color: #fca5a5; }}
 .verdict-info    {{ background: {CARD_BG}; border-left: 3px solid {ACCENT_CYAN}; color: {TEXT_MUTED}; }}
 
-/* ── Overview cards ────────────────────────────────────────────────────── */
+# Overview cards  
 .overview-card {{
     background: {CARD_BG};
     border: 1px solid #1e293b;
@@ -185,7 +177,7 @@ hr {{ border-color: #1e293b; margin: 1.2rem 0; }}
     margin: 0;
 }}
 
-/* ── Stat pills ────────────────────────────────────────────────────────── */
+# Stat pills 
 .stat-pill {{
     display: inline-block;
     background: #1e293b;
@@ -196,7 +188,7 @@ hr {{ border-color: #1e293b; margin: 1.2rem 0; }}
     margin: 0.15rem 0.1rem 0 0;
 }}
 
-/* ── Buttons ───────────────────────────────────────────────────────────── */
+# Buttons
 .stButton > button {{
     background: {ACCENT_BLUE} !important;
     color: #fff !important;
@@ -212,7 +204,7 @@ hr {{ border-color: #1e293b; margin: 1.2rem 0; }}
     background: #2563eb !important;
 }}
 
-/* ── Section labels ────────────────────────────────────────────────────── */
+# Section labels  
 .section-label {{
     font-size: 0.68rem;
     text-transform: uppercase;
@@ -221,7 +213,7 @@ hr {{ border-color: #1e293b; margin: 1.2rem 0; }}
     margin-bottom: 0.2rem;
 }}
 
-/* ── Reduce selectbox / number input border noise ──────────────────────── */
+# Reduce selectbox / number input border noise 
 [data-testid="stSelectbox"] > div > div,
 [data-testid="stNumberInput"] input {{
     background: {CARD_BG} !important;
@@ -232,9 +224,7 @@ hr {{ border-color: #1e293b; margin: 1.2rem 0; }}
 st.markdown(CSS, unsafe_allow_html=True)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # DATA LOADING
-# ─────────────────────────────────────────────────────────────────────────────
 @st.cache_data
 def load_posterior() -> pd.DataFrame:
     path = BASE / "data/processed/posterior_samples.csv"
@@ -269,9 +259,7 @@ def _synthetic_posterior() -> pd.DataFrame:
     return pd.DataFrame(data)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # HELPERS
-# ─────────────────────────────────────────────────────────────────────────────
 def age_band(age: int) -> str:
     if age < 21:   return "U21"
     if age <= 25:  return "21-25"
@@ -333,29 +321,27 @@ def fee_posterior(
     return mv_m * np.exp(log_prem), corridor_found
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # PAGE 1 — PROJECT OVERVIEW
-# ─────────────────────────────────────────────────────────────────────────────
 def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
     st.markdown("## Transfer Market Inefficiencies")
     st.markdown(
         f"<p style='color:{TEXT_MUTED}; font-size:0.875rem; margin-top:-0.6rem; margin-bottom:1.5rem;'>"
-        "DS4420 · Spring 2026 &nbsp;·&nbsp; Bayesian quantification of systematic fee premiums in European football"
+        "DS4420 &nbsp;·&nbsp; Spring 2026 &nbsp;·&nbsp; Modeling fee premiums in European football transfers"
         "</p>",
         unsafe_allow_html=True,
     )
 
-    # ── Three-column info cards ───────────────────────────────────────────────
+    # Three-column info cards
     c1, c2, c3 = st.columns(3, gap="medium")
 
     with c1:
         st.markdown(
             """<div class="overview-card">
             <div class="card-tag">The Problem</div>
-            <p>Football clubs systematically overpay relative to a player's objective performance value.
-            These premiums are not random — they cluster around specific transfer corridors, positions,
-            and age windows. We quantify this mispricing across 1,400+ documented transfers
-            spanning the Big 5 European leagues (2000–2023).</p>
+            <p>Clubs don't just pay for a player's performance. They pay for scarcity, prestige,
+            and the corridor the deal happens to cross. These premiums aren't random; they show up
+            consistently on certain routes, positions, and age groups. We look at 1,400+ transfers
+            across the Big 5 European leagues (2000-2023) to measure how big those patterns are.</p>
             </div>""",
             unsafe_allow_html=True,
         )
@@ -364,9 +350,9 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
         st.markdown(
             """<div class="overview-card">
             <div class="card-tag">Model 1 &nbsp;·&nbsp; MLP Valuation</div>
-            <p>A multi-layer perceptron trained on per-90 performance statistics predicts each
-            player's <em>intrinsic market value</em> — the fee a purely rational buyer would
-            pay based on on-pitch output alone. This becomes the baseline for Model 2.</p>
+            <p>A multi-layer perceptron trained on per-90 performance stats gives us a
+            <em>baseline valuation</em> for each player, essentially what you'd expect to
+            pay going purely off on-pitch output. That predicted value feeds into Model 2.</p>
             <p style="margin-top:0.85rem;">
             <span class="stat-pill">PyTorch</span>
             <span class="stat-pill">3-layer MLP</span>
@@ -382,9 +368,9 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
             """<div class="overview-card">
             <div class="card-tag">Model 2 &nbsp;·&nbsp; Bayesian Hierarchical</div>
             <p>A hand-coded Gibbs sampler models the <em>log-ratio premium</em>
-            — log(actual fee) − log(predicted value) — with partial pooling over three
-            grouping factors: transfer corridor (e.g. Spain → England), player position,
-            and age band. Posterior uncertainty is propagated into every fee estimate.</p>
+            (log actual fee - log predicted value) with partial pooling over three
+            groups: transfer corridor (i.e. Spain to England), player position, and age band.
+            The full posterior distribution gets passed through to every fee estimate.</p>
             <p style="margin-top:0.85rem;">
             <span class="stat-pill">R · Manual Gibbs</span>
             <span class="stat-pill">10 k iterations</span>
@@ -397,7 +383,7 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ── Key findings metrics ──────────────────────────────────────────────────
+    # Key findings metrics
     st.markdown("### Key Findings")
 
     alpha_med      = post["alpha"].median()
@@ -442,162 +428,51 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
 
     st.markdown("---")
 
-    # ── Caterpillar plots ─────────────────────────────────────────────────────
+    # Caterpillar plots 
     st.markdown("### Posterior Effect Estimates")
     st.markdown(
         f"<p style='color:{TEXT_MUTED}; font-size:0.8rem; margin-top:-0.5rem; margin-bottom:1rem;'>"
-        "Dots show posterior mean; lines are 90% credible intervals. "
-        "Right of zero = premium above global baseline; left = discount."
+        "Each dot is the posterior mean; the line is the 90% credible interval. "
+        "Right of zero means clubs tend to pay a premium on top of the global baseline; left means a discount."
         "</p>",
         unsafe_allow_html=True,
     )
 
     pc1, pc2 = st.columns(2, gap="medium")
 
-    corridor_img = ASSETS / "caterpillar_corridor.png"
-    position_img = ASSETS / "caterpillar_position.png"
+    corridor_img = ASSETS / "catepillar_corridor.png"
+    position_img = ASSETS / "catepillar_position.png"
 
     with pc1:
-        st.markdown(f"**Corridor Effects (γ)** — log-scale, partial pooling across {len(gamma_cols)} corridors")
-        if corridor_img.exists():
-            st.image(str(corridor_img), use_container_width=True)
-        else:
-            _caterpillar_plot(post, kind="corridor")
+        st.markdown(f"**Corridor Effects (γ)** : log-scale across {len(gamma_cols)} corridors")
+        st.image(str(corridor_img), use_container_width=True)
 
     with pc2:
-        st.markdown("**Position Effects (δ)** — relative to global mean")
-        if position_img.exists():
-            st.image(str(position_img), use_container_width=True)
-        else:
-            _caterpillar_plot(post, kind="position")
+        st.markdown("**Position Effects** : relative to global mean")
+        st.image(str(position_img), use_container_width=True)
 
-    # ── Age band summary ──────────────────────────────────────────────────────
+    # Age band summary
     st.markdown("---")
-    st.markdown("### Age Band Effects (φ)")
+    st.markdown("### Age Band Effects")
     st.markdown(
         f"<p style='color:{TEXT_MUTED}; font-size:0.8rem; margin-top:-0.5rem; margin-bottom:1rem;'>"
-        "Posterior mean and 90% CI for each age group, relative to global baseline.</p>",
+        "Posterior mean and 90% CI for each age group. Shows how much the expected fee shifts "
+        "depending on where a player falls in their career relative to the global baseline.</p>",
         unsafe_allow_html=True,
     )
-    _age_band_chart(post)
-
-
-def _caterpillar_plot(post: pd.DataFrame, kind: str) -> None:
-    """Interactive Plotly caterpillar — shown when PNG is not available."""
-    if kind == "corridor":
-        cols   = [c for c in post.columns if c.startswith("gamma_")]
-        labels = [corridor_label(c.replace("gamma_", "")) for c in cols]
-        height = max(500, len(cols) * 11 + 80)
-        title  = "Corridor Effects (γ)"
+    age_band_img = ASSETS / "age_band.png"
+    if age_band_img.exists():
+        st.image(str(age_band_img), use_container_width=True)
     else:
-        cols   = [c for c in post.columns if c.startswith("delta_")]
-        labels = [POS_LABELS.get(c.replace("delta_", ""), c.replace("delta_", "")) for c in cols]
-        height = 420
-        title  = "Position Effects (δ)"
+        _age_band_chart(post)
 
-    means = post[cols].mean().values
-    lo    = post[cols].quantile(0.05).values
-    hi    = post[cols].quantile(0.95).values
-    idx   = np.argsort(means)
-    means, lo, hi = means[idx], lo[idx], hi[idx]
-    labels = [labels[i] for i in idx]
-
-    fig = go.Figure()
-    for i, (l, h, m, lbl) in enumerate(zip(lo, hi, means, labels)):
-        c = ACCENT_BLUE if m >= 0 else DANGER
-        fig.add_trace(go.Scatter(
-            x=[l, h], y=[lbl, lbl], mode="lines",
-            line=dict(color=c, width=1.8), showlegend=False, hoverinfo="skip",
-        ))
-        fig.add_trace(go.Scatter(
-            x=[m], y=[lbl], mode="markers",
-            marker=dict(color="white", size=5, symbol="circle"),
-            showlegend=False,
-            hovertemplate=f"<b>{lbl}</b><br>Mean: {m:.3f}<br>90% CI: [{l:.3f}, {h:.3f}]<extra></extra>",
-        ))
-
-    fig.add_vline(x=0, line_dash="dash", line_color="#334155", line_width=1)
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor=CARD_BG,
-        plot_bgcolor=CARD_BG,
-        height=height,
-        margin=dict(l=180 if kind == "corridor" else 130, r=20, t=30, b=40),
-        title=dict(text=title, font=dict(size=12, color=TEXT_MUTED), x=0),
-        xaxis=dict(
-            title="Log-scale Effect",
-            gridcolor="#1e293b",
-            zerolinecolor="#334155",
-            tickfont=dict(size=9, color=TEXT_MUTED),
-        ),
-        yaxis=dict(
-            tickfont=dict(size=8 if kind == "corridor" else 10, color="#cbd5e1"),
-            gridcolor="#1e293b",
-        ),
-        hoverlabel=dict(bgcolor="#1e293b", font_size=11),
-    )
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-
-def _age_band_chart(post: pd.DataFrame) -> None:
-    phi_cols = [c for c in post.columns if c.startswith("phi_")]
-    labels   = [c.replace("phi_", "") for c in phi_cols]
-    means    = post[phi_cols].mean().values
-    lo       = post[phi_cols].quantile(0.05).values
-    hi       = post[phi_cols].quantile(0.95).values
-
-    ORDER = ["U21", "21-25", "26-29", "30+"]
-    order_map = {k: i for i, k in enumerate(ORDER)}
-    idx = sorted(range(len(labels)), key=lambda i: order_map.get(labels[i], 99))
-    labels = [labels[i] for i in idx]
-    means, lo, hi = means[idx], lo[idx], hi[idx]
-
-    colors = [ACCENT_BLUE if m >= 0 else DANGER for m in means]
-
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=labels, y=means,
-        error_y=dict(
-            type="data",
-            symmetric=False,
-            array=hi - means,
-            arrayminus=means - lo,
-            color="#475569",
-            thickness=1.5,
-            width=6,
-        ),
-        marker_color=colors,
-        opacity=0.8,
-        hovertemplate="<b>%{x}</b><br>Mean: %{y:.3f}<extra></extra>",
-    ))
-    fig.add_hline(y=0, line_dash="dash", line_color="#334155", line_width=1)
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor=CARD_BG,
-        plot_bgcolor=CARD_BG,
-        height=280,
-        margin=dict(l=20, r=20, t=20, b=40),
-        xaxis=dict(tickfont=dict(size=11, color="#cbd5e1"), gridcolor="#1e293b"),
-        yaxis=dict(
-            title="Log-scale Effect",
-            gridcolor="#1e293b",
-            tickfont=dict(size=10, color=TEXT_MUTED),
-        ),
-        showlegend=False,
-        hoverlabel=dict(bgcolor="#1e293b", font_size=11),
-    )
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # PAGE 2 — DEAL EVALUATOR
-# ─────────────────────────────────────────────────────────────────────────────
 def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
     st.markdown("## Deal Evaluator")
     st.markdown(
         f"<p style='color:{TEXT_MUTED}; font-size:0.875rem; margin-top:-0.6rem; margin-bottom:1.5rem;'>"
-        "Assess a proposed transfer fee against the Bayesian posterior — "
-        "given the corridor, position, and age profile."
+        "Enter a player profile and see where a quoted fee lands relative to what clubs have historically paid "
+        "for similar players on the same corridor."
         "</p>",
         unsafe_allow_html=True,
     )
@@ -606,10 +481,10 @@ def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
     buy_opts  = buying_countries(post)
     pos_opts  = sorted(c.replace("delta_", "") for c in post.columns if c.startswith("delta_"))
 
-    # ── Layout ────────────────────────────────────────────────────────────────
+    # Layout
     input_col, _, output_col = st.columns([1, 0.04, 2.3], gap="small")
 
-    # ─── Input panel ──────────────────────────────────────────────────────────
+    # Input panel
     with input_col:
         st.markdown("### Player Profile")
 
@@ -638,7 +513,7 @@ def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
         )
 
         st.markdown("---")
-        st.markdown("<p class='section-label'>Optional — Quoted Fee</p>", unsafe_allow_html=True)
+        st.markdown("<p class='section-label'>Optional: Quoted Fee</p>", unsafe_allow_html=True)
         show_quote = st.checkbox("I have a quoted fee to assess")
         quoted_fee: float | None = None
         if show_quote:
@@ -651,7 +526,7 @@ def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
         st.markdown("<br>", unsafe_allow_html=True)
         st.button("Evaluate Transfer", type="primary")
 
-    # ─── Output panel ─────────────────────────────────────────────────────────
+    # Output panel
     with output_col:
         corridor       = f"{sell_c}_to_{buy_c}"
         samples, found = fee_posterior(post, corridor, position, player_age, mv_m)
@@ -660,23 +535,22 @@ def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
         ab_label = age_band(player_age)
         premium  = med / mv_m
 
-        # ── Warning if corridor not in model ─────────────────────────────────
+        # Warning if corridor not in model
         if not found:
             st.markdown(
                 f"<div class='verdict-box verdict-info'>"
-                f"⚠ Corridor <strong>{corridor_label(corridor)}</strong> has limited data "
-                f"in the training set. Fee estimate uses only the global intercept, "
-                f"position, and age band effects.</div>",
+                f"⚠ The <strong>{corridor_label(corridor)}</strong> corridor has limited data "
+                f"in the training set, so the fee estimate is based on the global intercept, "
+                f"position, and age band only.</div>",
                 unsafe_allow_html=True,
             )
 
-        # ── Summary sentence ──────────────────────────────────────────────────
+        # Summary sentence
         summary = (
-            f"Based on historical transfer patterns, a <strong>{pos_lbl}</strong> aged "
-            f"<strong>{player_age}</strong> ({ab_label}) moving from "
-            f"<strong>{sell_c.replace('_', ' ')}</strong> to "
+            f"A <strong>{pos_lbl}</strong> aged <strong>{player_age}</strong> ({ab_label}) "
+            f"moving from <strong>{sell_c.replace('_', ' ')}</strong> to "
             f"<strong>{buy_c.replace('_', ' ')}</strong> with a market value of "
-            f"<strong>{fmt_m(mv_m)}</strong> would be expected to sell for "
+            f"<strong>{fmt_m(mv_m)}</strong> has typically sold for "
             f"<strong>{fmt_m(lo5)}</strong> to <strong>{fmt_m(hi95)}</strong> "
             f"<span style='color:{TEXT_MUTED};'>(90% credible interval).</span>"
         )
@@ -685,7 +559,7 @@ def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
             unsafe_allow_html=True,
         )
 
-        # ── Key metrics ───────────────────────────────────────────────────────
+        # Key metrics
         km1, km2, km3, km4 = st.columns(4, gap="small")
         km1.metric("Median Expected Fee", fmt_m(med))
         km2.metric("90% CI Low",          fmt_m(lo5))
@@ -694,50 +568,49 @@ def page_deal_evaluator(post: pd.DataFrame, inp: pd.DataFrame) -> None:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # ── Histogram ─────────────────────────────────────────────────────────
+        # Histogram
         fig = _histogram(samples, mv_m, lo5, hi95, med, quoted_fee)
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-        # ── Quoted fee verdict ────────────────────────────────────────────────
+        # Quoted fee verdict
         if quoted_fee is not None:
             if quoted_fee < lo5:
                 v_class, v_word, v_color = "verdict-bargain", "BARGAIN", SUCCESS
                 v_detail = (
                     f"The quoted fee of {fmt_m(quoted_fee)} is below the 5th percentile "
-                    f"of the expected distribution — historically rare to acquire this "
-                    f"profile this cheaply."
+                    f"of the expected distribution. It's rare to pick up this profile this cheaply."
                 )
             elif quoted_fee > hi95:
                 v_class, v_word, v_color = "verdict-overpay", "OVERPAY", DANGER
                 v_detail = (
-                    f"The quoted fee of {fmt_m(quoted_fee)} exceeds the 95th percentile — "
-                    f"clubs virtually never pay this much for this profile on this corridor."
+                    f"The quoted fee of {fmt_m(quoted_fee)} is above the 95th percentile. "
+                    f"Clubs almost never pay this much for this type of player on this corridor."
                 )
             else:
                 pct = (samples < quoted_fee).mean() * 100
                 v_class, v_word, v_color = "verdict-range", "WITHIN RANGE", ACCENT_CYAN
                 v_detail = (
                     f"The quoted fee of {fmt_m(quoted_fee)} sits at the "
-                    f"{pct:.0f}th percentile of the expected distribution — "
-                    f"within normal market range for this profile."
+                    f"{pct:.0f}th percentile of the expected distribution, "
+                    f"which is within the normal range for this profile."
                 )
             st.markdown(
                 f"<div class='verdict-box {v_class}'>"
                 f"<strong style='color:{v_color};'>{v_word}</strong>"
-                f" — {v_detail}</div>",
+                f" &nbsp; {v_detail}</div>",
                 unsafe_allow_html=True,
             )
 
         st.markdown("---")
 
-        # ── Sourcing comparison panel ─────────────────────────────────────────
-        st.markdown(f"### Sourcing Map — Top Corridors into {buy_c}")
+        # Sourcing comparison panel
+        st.markdown(f"### Sourcing Map: Top Corridors into {buy_c}")
         st.markdown(
             f"<p style='color:{TEXT_MUTED}; font-size:0.8rem; margin-top:-0.5rem; margin-bottom:0.75rem;'>"
-            f"Expected fee ranges for a <strong style='color:#f1f5f9'>{pos_lbl}</strong>, "
+            f"Fee ranges for a <strong style='color:#f1f5f9'>{pos_lbl}</strong>, "
             f"age <strong style='color:#f1f5f9'>{player_age}</strong>, "
-            f"{fmt_m(mv_m)} market value — across the most-active selling markets to {buy_c}. "
-            f"Helps identify where to source this type of player at lower cost.</p>",
+            f"{fmt_m(mv_m)} market value, across the busiest selling markets into {buy_c}. "
+            f"If the selected corridor looks expensive, this shows cheaper alternatives.</p>",
             unsafe_allow_html=True,
         )
         _sourcing_panel(post, inp, buy_c, position, player_age, mv_m, corridor)
@@ -973,9 +846,7 @@ def _sourcing_panel(
     )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # SIDEBAR + ROUTING
-# ─────────────────────────────────────────────────────────────────────────────
 def main() -> None:
     post = load_posterior()
     inp  = load_model2_input()
