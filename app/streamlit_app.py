@@ -275,8 +275,8 @@ def fmt_m(val: float) -> str:
 
 
 def corridor_label(raw: str) -> str:
-    """'France_to_England'  →  'France → England'"""
-    return raw.replace("_to_", " → ").replace("_", " ")
+    """'France_to_England'  ->  'France -> England'"""
+    return raw.replace("_to_", " -> ").replace("_", " ")
 
 
 def selling_countries(post: pd.DataFrame) -> list[str]:
@@ -368,14 +368,12 @@ def page_overview(post: pd.DataFrame, inp: pd.DataFrame) -> None:
             """<div class="overview-card">
             <div class="card-tag">Model 2 &nbsp;·&nbsp; Bayesian Hierarchical</div>
             <p>A hand-coded Gibbs sampler models the <em>log-ratio premium</em>
-            (log actual fee - log predicted value) with partial pooling over three
-            groups: transfer corridor (i.e. Spain to England), player position, and age band.
+            (log actual fee - log predicted value) over three groups: transfer
+            corridor (i.e. Spain to England), player position, and age band.
             The full posterior distribution gets passed through to every fee estimate.</p>
             <p style="margin-top:0.85rem;">
             <span class="stat-pill">R · Manual Gibbs</span>
             <span class="stat-pill">10 k iterations</span>
-            <span class="stat-pill">Partial pooling</span>
-            <span class="stat-pill">8,200 post-burnin draws</span>
             </p>
             </div>""",
             unsafe_allow_html=True,
@@ -834,7 +832,7 @@ def _sourcing_panel(
     st.markdown(
         f"<p style='color:{TEXT_MUTED}; font-size:0.75rem; margin-top:-0.5rem;'>"
         f"◆ Diamond = selected corridor ({corridor_label(sel_corridor)}).  "
-        f"Thick bar = 50 % CI · Thin bar = 90 % CI · Sorted lowest → highest median."
+        f"Thick bar = 50 % CI · Thin bar = 90 % CI · Sorted lowest -> highest median."
         f"</p>",
         unsafe_allow_html=True,
     )
